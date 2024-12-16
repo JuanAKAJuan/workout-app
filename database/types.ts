@@ -1,7 +1,7 @@
 export interface Exercise {
     id: number;
     name: string;
-    category: string;
+    muscleGroup: string;
 }
 
 export type NewExercise = Omit<Exercise, 'id'>;

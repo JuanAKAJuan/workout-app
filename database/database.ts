@@ -2,13 +2,14 @@ import * as SQLite from 'expo-sqlite';
 import { Exercise, NewExercise, Workout, NewWorkout, WorkoutExercise, NewWorkoutExercise } from './types';
 
 class WorkoutDatabase {
-    private db: SQLite.SQLiteDatabase;
+    private db: SQLite.SQLiteDatabase | null = null;
+    private initialized = false;
 
-    constructor() {
-        this.init();
-    }
+    constructor() {}
 
-    private async init(): Promise<void> {
+    private async ensureInitialized() {
+        if (this.initialized) return;
+
         try {
             this.db = await SQLite.openDatabaseAsync('workout.db');
 
@@ -16,6 +17,7 @@ class WorkoutDatabase {
             await this.db.execAsync('PRAGMA journal_mode = WAL;');
 
             await this.setupTables();
+            this.initialized = true;
         } catch (error) {
             console.error('Database initialization failed:', error);
             throw error;
@@ -23,11 +25,13 @@ class WorkoutDatabase {
     }
 
     private async setupTables(): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+
         await this.db.execAsync(`
             CREATE TABLE IF NOT EXISTS exercises (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                category TEXT NOT NULL
+                muscleGroup TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS workouts (
@@ -54,22 +58,34 @@ class WorkoutDatabase {
      * Exercise Operations *
      ***********************/
     public async addExercise(exercise: NewExercise): Promise<number> {
-        const result = await this.db.runAsync('INSERT INTO exercises (name, category, instructions) VALUES (?, ?, ?)', [
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
+        const result = await this.db.runAsync('INSERT INTO exercises (name, muscleGroup) VALUES (?, ?)', [
             exercise.name,
-            exercise.category,
+            exercise.muscleGroup,
         ]);
         return result.lastInsertRowId;
     }
 
     public async getExercise(id: number): Promise<Exercise | null> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         return await this.db.getFirstAsync<Exercise>('SELECT * FROM exercises WHERE id = ?', [id]);
     }
 
     public async getExercises(): Promise<Exercise[]> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         return await this.db.getAllAsync<Exercise>('SELECT * FROM exercises');
     }
 
     public async updateExercise(id: number, exercise: Partial<NewExercise>): Promise<void> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         const currentExercise = await this.getExercise(id);
         if (!currentExercise) {
             throw new Error(`Exercise with id ${id} not found`);
@@ -80,14 +96,17 @@ class WorkoutDatabase {
             ...exercise,
         };
 
-        await this.db.runAsync('UPDATE exercises SET name = ?, category = ? WHERE id = ?', [
+        await this.db.runAsync('UPDATE exercises SET name = ?, muscleGroup = ? WHERE id = ?', [
             updatedExercise.name,
-            updatedExercise.category,
+            updatedExercise.muscleGroup,
             id,
         ]);
     }
 
     public async deleteExercise(id: number): Promise<void> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         await this.db.runAsync('DELETE FROM exercises WHERE id = ?', [id]);
     }
 
@@ -95,6 +114,9 @@ class WorkoutDatabase {
      * Workout Operations *
      **********************/
     public async addWorkout(workout: NewWorkout): Promise<number> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         const result = await this.db.runAsync('INSERT INTO workouts (name, date, duration) VALUES (?, ?, ?)', [
             workout.name,
             workout.date,
@@ -104,14 +126,23 @@ class WorkoutDatabase {
     }
 
     public async getWorkout(id: number): Promise<Workout | null> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         return await this.db.getFirstAsync<Workout>('SELECT * FROM workouts WHERE id = ?', [id]);
     }
 
     public async getWorkouts(): Promise<Workout[]> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         return await this.db.getAllAsync<Workout>('SELECT * FROM workouts ORDER BY date DESC');
     }
 
     public async deleteWorkout(id: number): Promise<void> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         await this.db.runAsync('DELETE FROM workouts WHERE id = ?', [id]);
     }
 
@@ -119,6 +150,9 @@ class WorkoutDatabase {
      * WorkoutExercise Operations *
      ******************************/
     public async addExerciseToWorkout(workoutExercise: NewWorkoutExercise): Promise<number> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         const result = await this.db.runAsync(
             `INSERT INTO workout_exercises
             (workout_id, exercise_id, sets, reps, weight)
@@ -135,8 +169,11 @@ class WorkoutDatabase {
     }
 
     public async getWorkoutExercises(workoutId: number): Promise<(WorkoutExercise & Exercise)[]> {
+        await this.ensureInitialized();
+        if (!this.db) throw new Error('Database not initialized');
+
         return await this.db.getAllAsync<WorkoutExercise & Exercise>(
-            `SELECT we.*, e.name, e.category, e.instructions
+            `SELECT we.*, e.name, e.muscleGroup, e.instructions
             FROM workout_exercises we
             JOIN exercises e ON we.exercise_id = e.id
             WHERE we.workout_id = ?`,
