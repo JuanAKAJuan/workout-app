@@ -1,50 +1,42 @@
-# Welcome to your Expo app 👋
-
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Workout App
 
 ## Get started
 
 1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Start the app
+```bash
+npx expo start
+```
 
-## Learn more
+## Make a Preview build
+1. Make sure Java 17 is being used
+```bash
+sudo update-alternatives --config java
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+2. Set JAVA_HOME PATH and build
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-17.0.13.0.11-3.fc41.x86_64
+eas build --local -p android --profile preview
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+3. Send the apk file to the device plugged in via USB
+```bash
+adb install /home/juanix/Dev/Personal/workout-app/{apk file}
+```
 
-## Join the community
+## Rebuild the app
+```bash
+eas build --local -p android --profile preview
+adb install -r /path/to/your/{new apk file}
+```
+The -r flag will replace the existing app while preserving data.
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+One important note: The app will keep the same version number unless it is updated in `app.json`. If you want to be
+able to install the new version over the old one, increment either:
+- `version` - for major updates (e.g., "1.0.0" to "1.1.0")
+- `android.versionCode` - for minor updates

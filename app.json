@@ -18,7 +18,8 @@
       },
       "navigationBarColor": "#00000000",
       "softwareNavigationBarColor": "#121212",
-      navigationBarHidden: false,
+      "navigationBarHidden": false,
+      "package": "com.juandotsh.workoutapp"
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +41,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d255577a-c1b9-47cc-a0b1-e8e9342ed20f"
+      }
+    },
+    "owner": "juandotsh"
   }
 }
