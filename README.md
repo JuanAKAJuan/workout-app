@@ -1,4 +1,4 @@
-# Workout App
+# 1 Ton
 
 ## Get started
 
