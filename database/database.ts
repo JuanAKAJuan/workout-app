@@ -19,7 +19,7 @@ class WorkoutDatabase {
             await this.setupTables();
             this.initialized = true;
         } catch (error) {
-            console.error('Database initialization failed:', error);
+            console.error('Yikes, database initialization failed:', error);
             throw error;
         }
     }
