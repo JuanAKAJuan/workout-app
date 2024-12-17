@@ -12,9 +12,9 @@ import {
     Modal,
     FlatList,
 } from 'react-native';
-import { Colors, Spacing, Typography } from '../theme';
-import { db } from '../database';
-import { NewExercise } from '../database/types';
+import { Colors, Spacing, Typography } from '../../theme';
+import { db } from '@/database';
+import { NewExercise } from '@/database/types';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -33,7 +33,7 @@ const MUSCLE_GROUPS = [
     'Abs',
 ];
 
-export default function AddExercisePage() {
+export default function CreateExercise() {
     const router = useRouter();
 
     const [exercise, setExercise] = useState<NewExercise>({
@@ -60,7 +60,7 @@ export default function AddExercisePage() {
             Alert.alert('Success', 'Exercise added successfully', [
                 {
                     text: 'OK',
-                    onPress: () => router.navigate('/ExercisesScreen'),
+                    onPress: () => router.navigate('/exercises'),
                 },
             ]);
             setExercise({ name: '', muscleGroup: '' });

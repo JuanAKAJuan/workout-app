@@ -12,11 +12,11 @@ import {
 import { Link, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { db } from '../database';
-import { Exercise } from '../database/types';
-import { Colors, Spacing, Typography } from '../theme';
+import { db } from '@/database';
+import { Exercise } from '@/database/types';
+import { Colors, Spacing, Typography } from '@/theme';
 
-export default function ExercisesScreen() {
+export default function Exercises() {
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -114,7 +114,7 @@ export default function ExercisesScreen() {
                     </View>
                 )}
             />
-            <Link href="/AddExercisePage" asChild>
+            <Link href="/(create)/exercise" asChild>
                 <TouchableOpacity style={styles.fab}>
                     <Ionicons name="add" size={24} color={Colors.text.primary} />
                 </TouchableOpacity>

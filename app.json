@@ -40,7 +40,7 @@
       "expo-sqlite"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
     },
     "extra": {
       "router": {
