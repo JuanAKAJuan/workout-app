@@ -1,55 +1,55 @@
 {
-  "expo": {
-    "name": "workout-app",
-    "slug": "workout-app",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "navigationBarColor": "#00000000",
-      "softwareNavigationBarColor": "#121212",
-      "navigationBarHidden": false,
-      "package": "com.juandotsh.workoutapp"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      "expo-sqlite"
-    ],
-    "experiments": {
-      "typedRoutes": true,
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "d255577a-c1b9-47cc-a0b1-e8e9342ed20f"
-      }
-    },
-    "owner": "juandotsh"
-  }
+    "expo": {
+        "name": "workout-app",
+        "slug": "workout-app",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "scheme": "myapp",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/adaptive-icon.png",
+                "backgroundColor": "#ffffff"
+            },
+            "navigationBarColor": "#00000000",
+            "softwareNavigationBarColor": "#121212",
+            "navigationBarHidden": false,
+            "package": "com.juandotsh.workoutapp"
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/favicon.png"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/splash-icon.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#ffffff"
+                }
+            ],
+            "expo-sqlite"
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "router": {
+                "origin": false
+            },
+            "eas": {
+                "projectId": "d255577a-c1b9-47cc-a0b1-e8e9342ed20f"
+            }
+        },
+        "owner": "juandotsh"
+    }
 }

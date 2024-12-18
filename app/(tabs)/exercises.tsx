@@ -27,7 +27,7 @@ export default function Exercises() {
             const data = await db.getExercises();
             setExercises(data);
         } catch (error) {
-            console.error('Yikes, error loading exercises:', error);
+            console.error('Yikes. Error loading exercises:', error);
         } finally {
             setLoading(false);
         }
@@ -38,7 +38,7 @@ export default function Exercises() {
             await db.deleteExercise(id);
             setExercises(exercises.filter((exercise) => exercise.id !== id));
         } catch (error) {
-            console.error('Yikes, error deleting exercise:', error);
+            console.error('Yikes. Error deleting exercise:', error);
             Alert.alert('Error', 'Failed to delete exercise');
         }
     };

@@ -9,8 +9,6 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
-    FlatList,
-    TouchableNativeFeedbackBase,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Typography } from '@/theme';

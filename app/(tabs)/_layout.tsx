@@ -34,6 +34,8 @@ export default function CreateLayout() {
                                         return focused ? 'barbell' : 'barbell-outline';
                                     case 'settings':
                                         return focused ? 'settings' : 'settings-outline';
+                                    case 'history':
+                                        return focused ? 'time' : 'time-outline';
                                     default:
                                         return 'help-circle';
                                 }
@@ -55,6 +57,7 @@ export default function CreateLayout() {
                 >
                     <Tabs.Screen name="index" options={{ title: 'Home' }} />
                     <Tabs.Screen name="exercises" options={{ title: 'Exercises' }} />
+                    <Tabs.Screen name="history" options={{ title: 'History' }} />
                     <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
                 </Tabs>
             </ThemeProvider>

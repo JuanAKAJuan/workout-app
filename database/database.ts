@@ -5,8 +5,6 @@ class WorkoutDatabase {
     private db: SQLite.SQLiteDatabase | null = null;
     private initialized = false;
 
-    constructor() {}
-
     private async ensureInitialized() {
         if (this.initialized) return;
 
@@ -19,7 +17,7 @@ class WorkoutDatabase {
             await this.setupTables();
             this.initialized = true;
         } catch (error) {
-            console.error('Yikes, database initialization failed:', error);
+            console.error('Yikes. Database initialization failed:', error);
             throw error;
         }
     }
@@ -173,7 +171,7 @@ class WorkoutDatabase {
         if (!this.db) throw new Error('Database not initialized');
 
         return await this.db.getAllAsync<WorkoutExercise & Exercise>(
-            `SELECT we.*, e.name, e.muscleGroup, e.instructions
+            `SELECT we.*, e.name, e.muscleGroup
             FROM workout_exercises we
             JOIN exercises e ON we.exercise_id = e.id
             WHERE we.workout_id = ?`,
