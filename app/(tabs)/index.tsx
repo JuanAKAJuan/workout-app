@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import { Colors, Spacing, Typography } from '@/theme';
 import { db } from '@/database';
@@ -51,14 +52,48 @@ export default function Home() {
         setRefreshing(false);
     }, []);
 
+    const handleDelete = (id: number) => {
+        Alert.alert('Delete Template', 'Are you sure you want to delete this template?', [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        await db.deleteTemplate(id);
+                        await loadTemplates();
+                    } catch (error) {
+                        console.error('Error deleting template:', error);
+                        Alert.alert('Error', 'Failed to delete template');
+                    }
+                },
+            },
+        ]);
+    };
+
     const renderTemplate = ({ item }: { item: WorkoutTemplate }) => (
-        <TouchableOpacity style={styles.templateCard} onPress={() => startWorkout(item.id)}>
-            <View style={styles.templateInfo}>
-                <Text style={styles.templateName}>{item.name}</Text>
-            </View>
-            <Ionicons naem="play-circle" size={24} color={Colors.primary} />
-        </TouchableOpacity>
+        <Swipeable
+            renderRightActions={() => renderRightActions(item.id)}
+            overshootRight={false}
+            friction={2}
+            rightThreshold={60}
+        >
+            <TouchableOpacity style={styles.templateCard} onPress={() => startWorkout(item.id)} activeOpacity={1}>
+                <View style={styles.templateInfo}>
+                    <Text style={styles.templateName}>{item.name}</Text>
+                </View>
+                <Ionicons name="play-circle" size={24} color={Colors.primary} />
+            </TouchableOpacity>
+        </Swipeable>
     );
+
+    const renderRightActions = (id: number) => {
+        return (
+            <TouchableOpacity style={styles.deleteAction} onPress={() => handleDelete(id)}>
+                <Ionicons name="trash" size={24} color={Colors.text.primary} />
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -146,5 +181,19 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
+    },
+
+    deleteAction: {
+        backgroundColor: Colors.error,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: 65,
+        borderRadius: 8,
+    },
+
+    swipeableContainer: {
+        backgroundColor: Colors.surface,
+        borderRadius: 8,
     },
 });
