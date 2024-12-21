@@ -15,45 +15,25 @@ import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { db } from '@/database';
-import { Exercise, NewTemplateExercise } from '@/database';
+import { Exercise } from '@/database';
 import { Colors, Spacing, Typography } from '@/theme';
 import ExerciseSelectionModal from '../components/modals/ExerciseSelectionModal';
-
-interface TemplateExerciseItem extends Exercise {
-    setCount: number;
-    targetReps: number;
-    targetWeight: number | null;
-}
 
 export default function CreateTemplate() {
     const router = useRouter();
     const navigation = useNavigation();
     const [name, setName] = useState<string>('');
-    const [selectedExercises, setSelectedExercises] = useState<TemplateExerciseItem[]>([]);
+    const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [isExerciseModalVisible, setIsExerciseModalVisible] = useState(false);
+    const [isExerciseModalVisible, setIsExerciseModalVisible] = useState<boolean>(false);
 
     const handleAddExercise = async () => {
         setIsExerciseModalVisible(true);
     };
 
     const handleExerciseSelect = (exercise: Exercise) => {
-        setSelectedExercises((prev) => [
-            ...prev,
-            {
-                ...exercise,
-                setCount: 1,
-                targetReps: 0,
-                targetWeight: null,
-            },
-        ]);
+        setSelectedExercises((prev) => [...prev, exercise]);
         setIsExerciseModalVisible(false);
-    };
-
-    const updateExerciseDetails = (index: number, updates: Partial<TemplateExerciseItem>) => {
-        setSelectedExercises((exercises) =>
-            exercises.map((exercise, i) => (i === index ? { ...exercise, ...updates } : exercise))
-        );
     };
 
     const removeExercise = (index: number) => {
@@ -80,26 +60,20 @@ export default function CreateTemplate() {
 
             for (let i = 0; i < selectedExercises.length; i++) {
                 const exercise = selectedExercises[i];
-                const templateExercise: NewTemplateExercise = {
+                await db.addExerciseToTemplate({
                     templateId,
                     exerciseId: exercise.id,
-                    setCount: exercise.setCount,
-                    targetReps: exercise.targetReps,
-                    targetWeight: exercise.targetWeight,
+                    setCount: 0,
+                    targetReps: 0,
+                    targetWeight: null,
                     order: i,
-                };
-                await db.addExerciseToTemplate(templateExercise);
+                });
             }
 
             Alert.alert('Success', 'Template created successfully', [
                 {
                     text: 'OK',
-                    onPress: () => {
-                        router.back();
-                        if (navigation.getParent()) {
-                            navigation.getParent()?.setParams({ refresh: Date.now() });
-                        }
-                    },
+                    onPress: () => router.push('/(tabs)'),
                 },
             ]);
         } catch (error) {
@@ -132,57 +106,14 @@ export default function CreateTemplate() {
                         <Text style={styles.sectionTitle}>Exercises</Text>
                         {selectedExercises.map((exercise, index) => (
                             <View key={`${exercise.id}-${index}`} style={styles.exerciseItem}>
-                                <View style={styles.exerciseHeader}>
-                                    <Text style={styles.exerciseName}>{exercise.name}</Text>
+                                <View style={styles.exerciseContent}>
+                                    <View>
+                                        <Text style={styles.exerciseName}>{exercise.name}</Text>
+                                        <Text style={styles.muscleGroup}>{exercise.muscleGroup}</Text>
+                                    </View>
                                     <TouchableOpacity onPress={() => removeExercise(index)} style={styles.removeButton}>
                                         <Ionicons name="close-circle" size={24} color={Colors.error} />
                                     </TouchableOpacity>
-                                </View>
-
-                                <View style={styles.exerciseDetails}>
-                                    <View style={styles.detailInput}>
-                                        <Text style={styles.detailLabel}>Sets</Text>
-                                        <TextInput
-                                            style={styles.numberInput}
-                                            value={exercise.setCount.toString()}
-                                            onChangeText={(text) => {
-                                                const value = parseInt(text) || 0;
-                                                updateExerciseDetails(index, { setCount: value });
-                                            }}
-                                            keyboardType="number-pad"
-                                            maxLength={2}
-                                        />
-                                    </View>
-
-                                    <View style={styles.detailInput}>
-                                        <Text style={styles.detailLabel}>Target Reps</Text>
-                                        <TextInput
-                                            style={styles.numberInput}
-                                            value={exercise.targetReps.toString()}
-                                            onChangeText={(text) => {
-                                                const value = parseInt(text) || 0;
-                                                updateExerciseDetails(index, { targetReps: value });
-                                            }}
-                                            keyboardType="number-pad"
-                                            maxLength={3}
-                                        />
-                                    </View>
-
-                                    <View style={styles.detailInput}>
-                                        <Text style={styles.detailLabel}>Target Weight</Text>
-                                        <TextInput
-                                            style={styles.numberInput}
-                                            value={exercise.targetWeight?.toString() || ''}
-                                            onChangeText={(text) => {
-                                                const value = text ? parseFloat(text) : null;
-                                                updateExerciseDetails(index, { targetWeight: value });
-                                            }}
-                                            keyboardType="decimal-pad"
-                                            maxLength={6}
-                                            placeholder="Optional"
-                                            placeholderTextColor={Colors.input.placeholder}
-                                        />
-                                    </View>
                                 </View>
                             </View>
                         ))}
@@ -276,11 +207,10 @@ const styles = StyleSheet.create({
         marginBottom: Spacing.md,
     },
 
-    exerciseHeader: {
+    exerciseContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: Spacing.md,
     },
 
     exerciseName: {
@@ -289,34 +219,13 @@ const styles = StyleSheet.create({
         color: Colors.text.primary,
     },
 
-    removeButton: {
-        padding: Spacing.xs,
-    },
-
-    exerciseDetails: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: Spacing.sm,
-    },
-
-    detailInput: {
-        flex: 1,
-    },
-
-    detailLabel: {
+    muscleGroup: {
         fontSize: Typography.sizes.sm,
         color: Colors.text.secondary,
-        marginBottom: Spacing.xs,
     },
 
-    numberInput: {
-        backgroundColor: Colors.input.background,
-        borderColor: Colors.input.border,
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: Spacing.md,
-        color: Colors.text.primary,
-        textAlign: 'center',
+    removeButton: {
+        padding: Spacing.xs,
     },
 
     addExerciseButton: {
