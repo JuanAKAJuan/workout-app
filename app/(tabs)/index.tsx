@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+
 import { Colors, Spacing, Typography } from '@/theme';
 import { db } from '@/database';
 import { WorkoutTemplate } from '@/database/types';
@@ -9,10 +10,17 @@ import { WorkoutTemplate } from '@/database/types';
 export default function Home() {
     const router = useRouter();
     const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
 
     useEffect(() => {
         loadTemplates();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadTemplates();
+        }, [])
+    );
 
     const loadTemplates = async () => {
         try {
@@ -37,6 +45,12 @@ export default function Home() {
         }
     };
 
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await loadTemplates();
+        setRefreshing(false);
+    }, []);
+
     const renderTemplate = ({ item }: { item: WorkoutTemplate }) => (
         <TouchableOpacity style={styles.templateCard} onPress={() => startWorkout(item.id)}>
             <View style={styles.templateInfo}>
@@ -53,17 +67,17 @@ export default function Home() {
                 renderItem={renderTemplate}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContent}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
                 ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>No workout templates yet</Text>
                     </View>
                 )}
             />
-            <Link href="/(create)/template" asChild>
-                <TouchableOpacity style={styles.fab}>
-                    <Ionicons name="add" size={24} color={Colors.text.primary} />
-                </TouchableOpacity>
-            </Link>
+            <TouchableOpacity style={styles.fab} onPress={() => router.push('/(create)/template')}>
+                <Ionicons name="add" size={24} color={Colors.text.primary} />
+            </TouchableOpacity>
         </View>
     );
 }
